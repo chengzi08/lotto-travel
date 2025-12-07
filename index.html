@@ -2,12 +2,15 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>樂透旅行 LOTTO TRAVEL</title>
+    
+    <!-- iOS Web App 設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="樂透旅行">
     <link rel="apple-touch-icon" href="icon.png">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@900&display=swap');
 
@@ -25,6 +28,8 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            /* 防止 iOS 回彈效果 */
+            overscroll-behavior: none;
         }
 
         .hidden { display: none !important; }
@@ -34,11 +39,14 @@
             background: linear-gradient(180deg, #fffebb 0%, #ffd700 40%, #ff8c00 100%);
             border: none;
             color: #8b0000;
-            padding: 15px 50px;
+            padding: 15px 40px;
             font-size: 24px;
             font-weight: 900;
             border-radius: 50px;
             cursor: pointer;
+            width: 80%;
+            max-width: 300px;
+            margin: 10px 0;
             box-shadow: 
                 0 0 15px #ffd700, 
                 0 5px 0 #b84e00,
@@ -46,11 +54,26 @@
             transition: transform 0.1s, filter 0.2s;
             position: relative;
             z-index: 10;
+            /* 禁止文字選取 */
+            user-select: none;
+            -webkit-user-select: none;
         }
+        /* 次要按鈕樣式 (編輯資料用) */
+        .btn-silver {
+            background: linear-gradient(180deg, #e0e0e0 0%, #bdbdbd 40%, #757575 100%);
+            color: #333;
+            box-shadow: 0 0 10px #aaa, 0 5px 0 #555, inset 0 2px 5px rgba(255,255,255,0.5);
+            font-size: 20px;
+        }
+
         .btn-gold:hover { filter: brightness(1.2); }
         .btn-gold:active {
             transform: translateY(4px);
             box-shadow: 0 0 5px #ffd700, 0 1px 0 #b84e00;
+        }
+        .btn-silver:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 5px #aaa, 0 1px 0 #555;
         }
         .btn-gold:disabled {
             background: #555;
@@ -99,7 +122,7 @@
 
         /* --- 輸入介面 --- */
         #input-container {
-            max-height: 60vh;
+            max-height: 50vh;
             overflow-y: auto;
             padding: 10px;
             scrollbar-width: thin;
@@ -122,6 +145,7 @@
             border-radius: 5px;
             background: #fff;
             font-weight: bold;
+            font-size: 16px; /* 防止 iOS 縮放 */
         }
         input:focus { border-color: #ffd700; outline: none; }
 
@@ -177,7 +201,7 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            transition: transform 4s cubic-bezier(0.1, 0.9, 0.2, 1); /* 轉動時間 4秒 */
+            transition: transform 4s cubic-bezier(0.1, 0.9, 0.2, 1);
         }
         .pointer {
             position: absolute;
@@ -294,24 +318,28 @@
             </text>
         </svg>
         <br><br>
-        <button class="btn-gold" onclick="goToInput()">開始旅程 START</button>
+        <!-- 修改：兩個按鈕 -->
+        <button class="btn-gold" onclick="startDirectly()">開始旅程 START</button>
+        <br>
+        <button class="btn-gold btn-silver" onclick="goToInput()">設定連結 SETTING</button>
     </div>
 
-    <!-- 頁面 2: 輸入連結 -->
+    <!-- 頁面 2: 輸入連結 (編輯資料) -->
     <div id="page-input" class="container hidden">
-        <h2 style="color:#ffd700; text-shadow:0 0 10px #b8860b;">輸入景點連結</h2>
+        <h2 style="color:#ffd700; text-shadow:0 0 10px #b8860b;">設定景點資料</h2>
         <div class="gold-frame">
             <div id="input-container"></div>
         </div>
         <br>
-        <button class="btn-gold" onclick="startSlotMachine()">確認資料 OK</button>
+        <!-- 修改：儲存並返回 -->
+        <button class="btn-gold" onclick="saveAndReturn()">儲存並返回 SAVE</button>
     </div>
 
     <!-- 頁面 3: 拉霸機 -->
     <div id="page-slot" class="container hidden">
         <svg class="svg-title" viewBox="0 0 400 80">
             <text x="50%" y="60" text-anchor="middle" font-size="50" font-weight="900" fill="url(#goldGradient)" stroke="none" filter="url(#glow)">
-                今天吃什麼?
+                今天去哪裡?
             </text>
         </svg>
         
@@ -360,27 +388,47 @@
 
     <script>
         // --- 1. 資料結構 ---
-        const categories = ["燒肉", "壽司", "甜點", "景點", "簡餐", "拉麵", "其他"];
-        const icons = {"燒肉":"🥩", "壽司":"🍣", "甜點":"🍰", "景點":"⛩️", "簡餐":"🍱", "拉麵":"🍜", "其他":"🎲"};
+        // 修改：將「景點」改為「購物」
+        const categories = ["燒肉", "壽司", "甜點", "購物", "簡餐", "拉麵", "其他"];
+        const icons = {"燒肉":"🥩", "壽司":"🍣", "甜點":"🍰", "購物":"🛍️", "簡餐":"🍱", "拉麵":"🍜", "其他":"🎲"};
         
         let travelData = {}; 
         let currentCategory = "";
         let currentBudget = "";
         let spinCount = 0;
 
+        // 頁面載入時讀取資料
+        window.onload = function() {
+            loadDataFromStorage();
+        };
+
+        function loadDataFromStorage() {
+            const stored = localStorage.getItem('lottoTravelDataLinks');
+            if (stored) {
+                travelData = JSON.parse(stored);
+            } else {
+                // 如果沒有資料，初始化為空
+                categories.forEach(cat => {
+                    travelData[cat] = { high: "", mid: "", low: "" };
+                });
+            }
+        }
+
+        // 初始化輸入框 (每次進入設定頁面時產生)
         function initInputs() {
             const container = document.getElementById('input-container');
             container.innerHTML = ""; 
             categories.forEach(cat => {
-                travelData[cat] = { high: "", mid: "", low: "" }; 
-                
+                // 確保該類別存在 (防止改版後舊資料缺少新類別)
+                if(!travelData[cat]) travelData[cat] = { high: "", mid: "", low: "" };
+
                 const div = document.createElement('div');
                 div.className = 'input-group';
                 div.innerHTML = `
                     <h3>${icons[cat]} ${cat}</h3>
-                    <div class="input-row"><input placeholder="高預算 $$$" onchange="updateData('${cat}', 'high', this.value)"></div>
-                    <div class="input-row"><input placeholder="中預算 $$" onchange="updateData('${cat}', 'mid', this.value)"></div>
-                    <div class="input-row"><input placeholder="低預算 $" onchange="updateData('${cat}', 'low', this.value)"></div>
+                    <div class="input-row"><input placeholder="高預算 $$$" value="${travelData[cat].high}" onchange="updateData('${cat}', 'high', this.value)"></div>
+                    <div class="input-row"><input placeholder="中預算 $$" value="${travelData[cat].mid}" onchange="updateData('${cat}', 'mid', this.value)"></div>
+                    <div class="input-row"><input placeholder="低預算 $" value="${travelData[cat].low}" onchange="updateData('${cat}', 'low', this.value)"></div>
                 `;
                 container.appendChild(div);
             });
@@ -388,19 +436,32 @@
 
         function updateData(cat, level, val) {
             travelData[cat][level] = val;
+            // 每次變更即時存入 localStorage (雙重保險)
+            localStorage.setItem('lottoTravelDataLinks', JSON.stringify(travelData));
         }
 
+        // --- 頁面切換 ---
         function showPage(id) {
             document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
+        // 按下「設定連結」
         function goToInput() {
+            loadDataFromStorage(); // 確保讀到最新
             initInputs();
             showPage('page-input');
         }
 
-        function startSlotMachine() {
+        // 按下「儲存並返回」
+        function saveAndReturn() {
+            localStorage.setItem('lottoTravelDataLinks', JSON.stringify(travelData));
+            showPage('page-start');
+        }
+
+        // 按下「開始旅程」
+        function startDirectly() {
+            loadDataFromStorage(); // 確保有資料
             showPage('page-slot');
         }
 
@@ -449,6 +510,7 @@
                     reel1.innerText = getRandomIcon();
                     reel2.innerText = getRandomIcon();
                     reel3.innerText = getRandomIcon();
+                    // 強制不中
                     if(reel1.innerText == reel2.innerText && reel2.innerText == reel3.innerText){
                         reel3.innerText = reel1.innerText === "🥩" ? "🍜" : "🥩";
                     }
@@ -464,7 +526,7 @@
             return icons[keys[Math.floor(Math.random() * keys.length)]];
         }
 
-        // --- 輪盤邏輯 (精準修正版) ---
+        // --- 輪盤邏輯 ---
         let wheelSegments = [];
         let ctx;
 
@@ -474,7 +536,7 @@
             canvas.height = 300;
             ctx = canvas.getContext("2d");
             
-            let r1 = Math.floor(Math.random() * 40) + 15; // 15-55
+            let r1 = Math.floor(Math.random() * 40) + 15; 
             let r2 = Math.floor(Math.random() * (90 - r1 - 10)) + 10;
             let r3 = 100 - r1 - r2;
 
@@ -497,7 +559,6 @@
             
             wheelSegments.forEach(seg => {
                 const sliceAngle = (seg.chance / total) * 2 * Math.PI;
-                // 記錄開始與結束角度(弧度)以便計算
                 seg.startAngle = currentAngle;
                 seg.endAngle = currentAngle + sliceAngle;
 
@@ -535,12 +596,10 @@
 
             const canvas = document.getElementById("canvas");
 
-            // ★ 修正邏輯：先決定贏家，再決定角度
             let rand = Math.random() * 100;
             let sum = 0;
             let winner = null;
             
-            // 決定贏家
             for(let seg of wheelSegments) {
                 sum += seg.chance;
                 if(rand <= sum) {
@@ -548,31 +607,22 @@
                     break;
                 }
             }
-            if(!winner) winner = wheelSegments[wheelSegments.length-1]; // 防止極端邊界誤差
+            if(!winner) winner = wheelSegments[wheelSegments.length-1];
             
             currentBudget = winner.code;
 
-            // ★ 計算需要轉到的目標角度
-            // 1. 找出贏家區塊在 Canvas 上的起始與結束角度 (弧度轉角度)
+            // 計算目標角度
             let startDeg = winner.startAngle * (180/Math.PI);
             let endDeg = winner.endAngle * (180/Math.PI);
             
-            // 2. 在這個區塊內隨機取一個點 (避免壓線)
             let targetOffset = Math.random() * (endDeg - startDeg - 10) + 5; 
             let targetAngleOnWheel = startDeg + targetOffset; 
 
-            // 3. 計算旋轉度數
-            // 指針在上方 (270度/-90度 位置)。
-            // Canvas 0度在右方(3點鐘)。
-            // 要讓 wheel 的 targetAngle 轉到 270度 的位置。
-            // 公式：旋轉角度 = (360 * 圈數) + (270 - 目標角度)
-            let extraSpins = 360 * 8; // 多轉幾圈增加刺激感
+            let extraSpins = 360 * 8; 
             let finalRotate = extraSpins + (270 - targetAngleOnWheel);
 
-            // 執行旋轉
             canvas.style.transform = `rotate(${finalRotate}deg)`;
 
-            // 等待動畫結束 (CSS 設定是 4秒)
             setTimeout(() => {
                 showResult(winner.label);
                 btn.disabled = false; 
@@ -597,7 +647,6 @@
             document.getElementById('result-modal').classList.add('hidden');
             showPage('page-start');
             spinCount = 0;
-            // 重置轉盤角度，為了下次計算方便
             document.getElementById("canvas").style.transition = 'none';
             document.getElementById("canvas").style.transform = "rotate(0deg)";
             setTimeout(() => {
