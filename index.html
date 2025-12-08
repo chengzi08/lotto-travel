@@ -42,6 +42,21 @@
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
+        body.theme-light {
+            background-color: #f6f6f6;
+            background-image:
+                radial-gradient(circle at 50% 30%, #fff 0%, #ddd 70%),
+                linear-gradient(0deg, rgba(255,255,255,0.6), transparent 2px),
+                linear-gradient(90deg, rgba(255,255,255,0.6), transparent 2px);
+            color: #111;
+        }
+        body.theme-gambler {
+            background-color: #02000a;
+            background-image:
+                radial-gradient(circle at 50% 30%, #150015 0%, #02000a 70%),
+                linear-gradient(0deg, rgba(255,0,204,0.1), transparent 2px),
+                linear-gradient(90deg, rgba(0,255,249,0.1), transparent 2px);
+        }
 
         .hidden { display: none !important; }
         
@@ -169,6 +184,26 @@
             gap: 20px;
             margin-top: 40px;
         }
+
+        /* 主題切換控制 */
+        .theme-control {
+            position: fixed;
+            top: 10px; right: 10px;
+            z-index: 1000;
+        }
+        .theme-select {
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-weight: 700;
+        }
+        body.theme-light .theme-select {
+            background: rgba(255,255,255,0.8);
+            color: #111;
+            border-color: #999;
+        }
         
         /* 歷史紀錄樣式 */
         .history-item {
@@ -229,6 +264,13 @@
             text-align: left;
             margin: 0 0 10px 0;
             text-shadow: 0 0 5px var(--gold);
+        }
+        .input-tools {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 10px 0 15px 0;
         }
         .input-row {
             display: flex;
@@ -542,9 +584,32 @@
             cursor: pointer;
             font-size: 16px;
         }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 10px 16px;
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            z-index: 1000;
+            box-shadow: 0 0 10px var(--gold);
+        }
     </style>
 </head>
 <body>
+
+    <div class="theme-control">
+        <select id="theme-select" class="theme-select">
+            <option value="dark">暗色</option>
+            <option value="light">亮色</option>
+            <option value="gambler">賭徒</option>
+        </select>
+    </div>
 
     <div id="page-start" class="container">
         <h1 class="main-title glitch" data-text="妍妍子京都賭徒之旅">妍妍子<br>京都賭徒之旅</h1>
@@ -560,6 +625,7 @@
             <button class="btn-action" id="btn-start">開始遊戲</button>
             <button class="btn-action btn-secondary" id="btn-input">設定資料</button>
             <button class="btn-action btn-secondary" style="background: linear-gradient(180deg, #444 0%, #222 100%); color: #fff; border-color: #777;" id="btn-history">抽獎紀錄</button>
+            <button class="btn-action" id="btn-adventure">大冒險卡片</button>
         </div>
     </div>
 
@@ -567,6 +633,12 @@
         <div class="back-btn" data-target="page-start">⬅ 返回</div>
         <h2 style="color:var(--gold); margin-top:40px;">店家資料設定</h2>
         <p style="font-size:12px; color:#aaa;">(輸入後將自動儲存)</p>
+        <div class="input-tools">
+            <button class="btn-action btn-secondary" id="btn-export">匯出資料</button>
+            <button class="btn-action btn-secondary" id="btn-import">匯入資料</button>
+            <button class="btn-action btn-secondary" id="btn-clear-all" style="background: linear-gradient(180deg, #660000 0%, #330000 100%); color: #fff; border-color: #990000;">清除全部資料</button>
+            <input type="file" id="input-import" accept="application/json" style="display:none" />
+        </div>
         <div id="input-container">
             </div>
     </div>
@@ -623,6 +695,18 @@
         </div>
     </div>
 
+    <div id="page-adventure" class="container hidden">
+        <div class="back-btn" data-target="page-start">⬅ 返回</div>
+        <h2 style="color:var(--gold); margin-top:40px;">大冒險卡片</h2>
+        <div style="height:10px"></div>
+        <div class="adventure-card" id="adv-card" style="margin:0 auto; width:300px; height:180px; border-radius:16px; background: linear-gradient(135deg, #111, #333); border: 3px solid var(--gold); box-shadow: 0 0 30px rgba(255,215,0,0.4); display:flex; align-items:center; justify-content:center; text-align:center; padding:10px;">
+            <div id="adv-text" style="color:#fff; font-size:18px; font-weight:900; text-shadow:0 0 8px #000;">點選下方按鈕抽一張卡</div>
+        </div>
+        <div style="height:20px"></div>
+        <button class="btn-action" id="btn-draw-adv">抽一張</button>
+        <button class="btn-action btn-secondary" id="btn-redraw-adv">再抽一次</button>
+    </div>
+
     <div id="mission-modal" class="modal-overlay hidden">
         <div class="result-card" style="border-color: var(--neon-pink); box-shadow: 0 0 30px var(--neon-pink);">
             <h1 class="win-title" style="color: var(--neon-pink);">特別任務!</h1>
@@ -659,6 +743,59 @@
         let travelData = {}; 
         let historyData = [];
 
+        // 大冒險卡片任務
+        const ADVENTURE_TASKS = [
+            "用 0.5x 廣角拍一張彼此的「大頭狗」醜照",
+        "互相幫拍一張很有「鬆弛感」的路邊抓拍",
+        "路邊隨機找一面鏡子，拍一張 Y2K 對鏡自拍",
+        "模仿 Threads 廢文風格，拍一張無意義的路面照",
+        "今天喝飲料禁止用吸管，直接就口喝（環保杯除外）",
+        "打開 Google Map 找評價最低的店去門口打卡",
+        "兩人交換墨鏡或配件，拍一張「OOTD」穿搭照",
+        "去超商買一個「包裝最醜」的零食交換吃",
+        "拍一張「原圖直出」完全不修圖的崩壞照",
+        "模仿長輩圖的姿勢，在景點拍一張「認同請分享」",
+        "找到一個紅色物件，模仿「牛看到紅布」的反應",
+        "模仿 MBTI 的 E 人，在路中間比超大愛心合照",
+        "模仿 MBTI 的 I 人，躲在角落拍一張「社恐」照",
+        "錄一段 10 秒影片，假裝自己是旅遊 Vlog 博主",
+        "找個影子，拍出「進擊的巨人」感覺",
+        "把手機桌布換成對方剛剛拍的最醜照片",
+        "10 分鐘內禁止說話，只能用比手畫腳溝通",
+        "用名字首字母找食物，找不到就不能吃下一餐",
+        "走進小巷，模仿「王家衛電影」風格拍一張emo照",
+        "模仿路邊看到的任何一個招牌上的姿勢",
+        "用倒影拍一張照片，標題打「另一個平行宇宙」",
+        "找一扇門，模仿《鬼店》探頭出來的經典畫面",
+        "看到海報或廣告，模仿上面的人臉表情",
+        "拍一張手手合照，模仿韓團的打氣手勢",
+        "把今天的收據拿在手上，拍一張「炫富」照",
+        "拍一張跳躍照，失敗要罰請喝飲料",
+        "互相連拍醜照，看誰的表情管理最失敗",
+        "找一個圓形元素，假裝是傳送門",
+        "找一個三角形，比出「光明會」手勢合照",
+        "找個乾淨背景，拍一張證件照風格的嚴肅臉",
+        "比出「777」手勢，拍一張看起來很幸運的照片",
+        "模仿《黑白大廚》，蒙眼試吃剛剛買的食物",
+        "拍一張背影照，假裝我們是「史密斯任務」特務",
+        "模仿路邊雕像，如果不像就重拍",
+        "今天的 Dress Code 是「自信」，走出六親不認的步伐",
+        "拍一張店名，大喊「這家店尊督假督好吃？」",
+        "遇到貓狗，模仿牠們的動作合照（請勿觸摸）",
+        "拍一張走路照，假裝被狗仔隊偷拍",
+        "截圖地圖位置，發限動問「急了，在線等，下一站去哪」",
+        "看到有趣的招牌，唸出來並錄下語音",
+        "由下往上拍（死亡視角），看誰雙下巴比較明顯",
+        "拍一張「我就靜靜看著你裝B」的眼神照",
+        "在人多的地方大喊一聲「好帥/好美！」並指著對方",
+        "模仿「鐵達尼號」或是「羅密歐」經典動作",
+        "超近距離拍攝五官特寫，猜猜是哪個部位",
+        "用前鏡頭自拍，但眼神要看旁邊（裝不經意）",
+        "一人彩色一人黑白，拍一張「穿越時空」合照",
+        "拍一張「精神狀態美麗」的發瘋照",
+        "結束前，模仿 YouTuber 做結尾：「記得按讚訂閱分享」"
+        ];
+
         // 狀態變數
         let currentCategory = "";
         let currentBudget = ""; // high, mid, low
@@ -671,6 +808,7 @@
             loadDataFromLocal();
             bindEvents();
             registerServiceWorker();
+            initTheme();
         });
 
         function bindEvents() {
@@ -680,6 +818,8 @@
             if (inputBtn) inputBtn.addEventListener('click', goToInput);
             const historyBtn = document.getElementById('btn-history');
             if (historyBtn) historyBtn.addEventListener('click', goToHistory);
+            const advBtn = document.getElementById('btn-adventure');
+            if (advBtn) advBtn.addEventListener('click', goToAdventure);
 
             document.querySelectorAll('.back-btn[data-target]').forEach(btn => {
                 btn.addEventListener('click', () => showPage(btn.dataset.target));
@@ -692,6 +832,52 @@
             if (closeBtn) closeBtn.addEventListener('click', closeModal);
             const missionOkBtn = document.getElementById('btn-mission-ok');
             if (missionOkBtn) missionOkBtn.addEventListener('click', closeMissionModal);
+
+            const exportBtn = document.getElementById('btn-export');
+            const importBtn = document.getElementById('btn-import');
+            const importInput = document.getElementById('input-import');
+            const clearAllBtn = document.getElementById('btn-clear-all');
+            if (exportBtn) exportBtn.addEventListener('click', exportData);
+            if (importBtn && importInput) importBtn.addEventListener('click', () => importInput.click());
+            if (importInput) importInput.addEventListener('change', (e) => {
+                const file = e.target.files && e.target.files[0];
+                if (file) importDataFile(file);
+                e.target.value = '';
+            });
+            if (clearAllBtn) clearAllBtn.addEventListener('click', clearAllData);
+
+            const inputContainer = document.getElementById('input-container');
+            if (inputContainer) inputContainer.addEventListener('change', (e) => {
+                const t = e.target;
+                if (t && t.matches('input[data-cat]')) {
+                    saveInput(t.dataset.cat, t.dataset.level, t.dataset.field, t.value);
+                    if (t.dataset.field === 'url') {
+                        autoFillNameFromUrl(t.dataset.cat, t.dataset.level, t.value);
+                    }
+                    showToast('已儲存');
+                }
+            });
+
+            const themeSelect = document.getElementById('theme-select');
+            if (themeSelect) themeSelect.addEventListener('change', () => setTheme(themeSelect.value));
+            const drawAdv = document.getElementById('btn-draw-adv');
+            const redrawAdv = document.getElementById('btn-redraw-adv');
+            if (drawAdv) drawAdv.addEventListener('click', drawAdventure);
+            if (redrawAdv) redrawAdv.addEventListener('click', drawAdventure);
+        }
+
+        function goToAdventure() {
+            showPage('page-adventure');
+        }
+
+        function drawAdventure() {
+            const idx = Math.floor(Math.random() * ADVENTURE_TASKS.length);
+            const card = document.getElementById('adv-card');
+            const textEl = document.getElementById('adv-text');
+            textEl.textContent = ADVENTURE_TASKS[idx];
+            card.style.animation = 'popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            setTimeout(() => card.style.animation = '', 600);
+            if (navigator.vibrate) navigator.vibrate([20, 20]);
         }
 
         function registerServiceWorker() {
@@ -747,16 +933,16 @@
                 div.innerHTML = `
                     <h3>${icons[cat]} ${cat}</h3>
                     <div class="input-row">
-                        <input placeholder="高預算店名" value="${hName}" onchange="saveInput('${cat}','high','name',this.value)">
-                        <input placeholder="連結" value="${hUrl}" onchange="saveInput('${cat}','high','url',this.value)">
+                        <input placeholder="高預算店名" value="${hName}" data-cat="${cat}" data-level="high" data-field="name">
+                        <input placeholder="連結" value="${hUrl}" data-cat="${cat}" data-level="high" data-field="url">
                     </div>
                     <div class="input-row">
-                        <input placeholder="中預算店名" value="${mName}" onchange="saveInput('${cat}','mid','name',this.value)">
-                        <input placeholder="連結" value="${mUrl}" onchange="saveInput('${cat}','mid','url',this.value)">
+                        <input placeholder="中預算店名" value="${mName}" data-cat="${cat}" data-level="mid" data-field="name">
+                        <input placeholder="連結" value="${mUrl}" data-cat="${cat}" data-level="mid" data-field="url">
                     </div>
                     <div class="input-row">
-                        <input placeholder="低預算店名" value="${lName}" onchange="saveInput('${cat}','low','name',this.value)">
-                        <input placeholder="連結" value="${lUrl}" onchange="saveInput('${cat}','low','url',this.value)">
+                        <input placeholder="低預算店名" value="${lName}" data-cat="${cat}" data-level="low" data-field="name">
+                        <input placeholder="連結" value="${lUrl}" data-cat="${cat}" data-level="low" data-field="url">
                     </div>
                 `;
                 container.appendChild(div);
@@ -767,6 +953,58 @@
             if(!travelData[cat][level]) travelData[cat][level] = {};
             travelData[cat][level][field] = value;
             saveDataToLocal(); // 每次修改立刻存檔
+        }
+
+        function autoFillNameFromUrl(cat, level, url) {
+            const nameEl = document.querySelector(`input[data-cat="${cat}"][data-level="${level}"][data-field="name"]`);
+            const currentName = nameEl ? nameEl.value.trim() : '';
+            if (currentName) return; // 已有名稱則不覆蓋
+            const derived = deriveNameFromUrl(url);
+            if (derived && nameEl) {
+                nameEl.value = derived;
+                saveInput(cat, level, 'name', derived);
+                showToast('已自動帶入店名');
+            }
+        }
+
+        function deriveNameFromUrl(url) {
+            if (!url) return '';
+            try {
+                const u = new URL(url);
+                // Google Maps: query 或 q 參數
+                const q = u.searchParams.get('query') || u.searchParams.get('q');
+                if (q) return decodeURIComponent(q).replace(/\+/g, ' ').trim();
+                // 取最後路徑段
+                const paths = u.pathname.split('/').filter(Boolean);
+                if (paths.length) {
+                    const last = decodeURIComponent(paths[paths.length - 1]);
+                    return last.replace(/[-_]/g, ' ').trim();
+                }
+                return u.hostname;
+            } catch {
+                // 非標準 URL，嘗試當作文字
+                return decodeURIComponent(url).trim();
+            }
+        }
+
+        function initTheme() {
+            const mode = localStorage.getItem('themeMode') || 'dark';
+            applyTheme(mode);
+            const themeSelect = document.getElementById('theme-select');
+            if (themeSelect) themeSelect.value = mode;
+        }
+
+        function setTheme(mode) {
+            localStorage.setItem('themeMode', mode);
+            applyTheme(mode);
+            showToast('已切換主題');
+        }
+
+        function applyTheme(mode) {
+            document.body.classList.remove('theme-dark','theme-light','theme-gambler');
+            if (mode === 'light') document.body.classList.add('theme-light');
+            else if (mode === 'gambler') document.body.classList.add('theme-gambler');
+            else document.body.classList.add('theme-dark');
         }
 
         function showPage(id) {
@@ -835,6 +1073,8 @@
             const lever = document.getElementById('lever');
             lever.classList.add('lever-pulled');
             setTimeout(() => lever.classList.remove('lever-pulled'), 300);
+
+            if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
 
             startSlotSpin();
         }
@@ -905,11 +1145,13 @@
                         // 顯示特別任務
                         document.getElementById('mission-modal').classList.remove('hidden');
                         isSlotSpinning = false; // 暫停自旋鎖，等待任務確認
+                        if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
                         // 注意：這裡不設定 isSlotSpinning = false 以防止重複拉桿，直到任務確認
                     } else {
                         initRoulette(); // 準備輪盤
                         showPage('page-roulette');
                         isSlotSpinning = false;
+                        if (navigator.vibrate) navigator.vibrate([30, 30]);
                     }
                 }, 2000);
 
@@ -1056,7 +1298,14 @@
             // 取得資料
             const data = travelData[currentCategory] ? travelData[currentCategory][currentBudget] : {};
             const name = (data && data.name) ? data.name : "未設定店名";
-            const url = (data && data.url) ? data.url : "https://www.google.com/maps";
+            let url = (data && data.url) ? data.url : "";
+            if (!url) {
+                if (name && name !== "未設定店名") {
+                    url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name + " " + (icons[currentCategory] ? currentCategory : ""));
+                } else {
+                    url = "https://www.google.com/maps";
+                }
+            }
 
             // 填入資訊
             document.getElementById('res-cat').textContent = icons[currentCategory] + " " + currentCategory;
@@ -1078,6 +1327,61 @@
             modal.classList.remove('hidden');
         }
 
+        function exportData() {
+            const blob = new Blob([JSON.stringify({ travelData, historyData }, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'kyoto-gambler-backup.json';
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('已匯出備份');
+        }
+
+        function importDataFile(file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    const obj = JSON.parse(reader.result);
+                    if (obj.travelData) travelData = obj.travelData;
+                    if (obj.historyData) historyData = obj.historyData;
+                    saveDataToLocal();
+                    saveHistoryToLocal();
+                    initInputs();
+                    showToast('匯入成功');
+                } catch (e) {
+                    showToast('匯入失敗，格式錯誤');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function clearAllData() {
+            if (confirm('確定要清除全部資料與紀錄嗎？')) {
+                travelData = {};
+                historyData = [];
+                categories.forEach(cat => travelData[cat] = { high: {}, mid: {}, low: {} });
+                saveDataToLocal();
+                saveHistoryToLocal();
+                initInputs();
+                renderHistory();
+                showToast('已清除全部資料');
+            }
+        }
+
+        function showToast(text) {
+            let t = document.getElementById('toast');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = 'toast';
+                t.className = 'toast';
+                document.body.appendChild(t);
+            }
+            t.textContent = text;
+            t.classList.remove('hidden');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => t.classList.add('hidden'), 1800);
+        }
+
         function closeModal() {
             document.getElementById('result-modal').classList.add('hidden');
             showPage('page-start');
@@ -1087,5 +1391,6 @@
         }
 
     </script>
+    <div id="toast" class="toast hidden"></div>
 </body>
 </html>
