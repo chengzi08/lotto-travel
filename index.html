@@ -62,16 +62,98 @@
         .main-title {
             font-size: 48px;
             color: #fff;
-            text-shadow: 
-                0 0 5px #fff,
-                0 0 10px #fff,
-                0 0 20px var(--neon-pink),
-                0 0 30px var(--neon-pink),
-                0 0 40px var(--neon-pink);
+            position: relative;
             margin: 0;
             line-height: 1.2;
             transform: skew(-5deg);
         }
+        
+        /* Glitch Effect */
+        .glitch {
+            position: relative;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink), 0 0 40px var(--neon-pink);
+        }
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+        }
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00fff9;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(30px, 9999px, 10px, 0); }
+            20% { clip: rect(80px, 9999px, 90px, 0); }
+            40% { clip: rect(10px, 9999px, 50px, 0); }
+            60% { clip: rect(40px, 9999px, 20px, 0); }
+            80% { clip: rect(90px, 9999px, 60px, 0); }
+            100% { clip: rect(20px, 9999px, 80px, 0); }
+        }
+        @keyframes glitch-anim2 {
+            0% { clip: rect(60px, 9999px, 30px, 0); }
+            20% { clip: rect(10px, 9999px, 50px, 0); }
+            40% { clip: rect(90px, 9999px, 10px, 0); }
+            60% { clip: rect(30px, 9999px, 80px, 0); }
+            80% { clip: rect(50px, 9999px, 20px, 0); }
+            100% { clip: rect(80px, 9999px, 40px, 0); }
+        }
+
+        /* --- 霓虹 HUD 動畫 --- */
+        .neon-circle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            perspective: 1000px;
+        }
+        .neon-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: var(--neon-pink);
+            border-bottom-color: #00fff9;
+            box-shadow: 0 0 20px var(--neon-pink), 0 0 40px #00fff9;
+            position: relative;
+            animation: spin-neon 2s linear infinite;
+        }
+        .neon-circle::before {
+            content: '';
+            position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-left-color: var(--gold);
+            border-right-color: var(--pachi-red);
+            animation: spin-neon-reverse 1.5s linear infinite;
+        }
+        .neon-inner-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 10px #fff, 0 0 20px var(--gold);
+            animation: pulse-text 0.5s infinite alternate;
+        }
+
+        @keyframes spin-neon { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes spin-neon-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+        @keyframes pulse-text { from { opacity: 0.8; transform: translate(-50%, -50%) scale(0.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
+
         .sub-title {
             font-size: 20px;
             color: var(--gold);
@@ -465,10 +547,14 @@
 <body>
 
     <div id="page-start" class="container">
-        <h1 class="main-title" style="font-size: 42px;">妍妍子<br>京都賭徒之旅</h1>
+        <h1 class="main-title glitch" data-text="妍妍子京都賭徒之旅">妍妍子<br>京都賭徒之旅</h1>
         <div class="sub-title">KYOTO GAMBLER TOUR</div>
         
-        <div style="font-size:60px; margin:20px 0; text-shadow:0 0 20px var(--pachi-red);">🌺</div>
+        <div class="neon-circle-container">
+            <div class="neon-circle">
+                <div class="neon-inner-text">777</div>
+            </div>
+        </div>
         
         <div class="home-btn-group">
             <button class="btn-action" id="btn-start">開始遊戲</button>

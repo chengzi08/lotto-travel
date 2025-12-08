@@ -1,7 +1,7 @@
 {
   "name": "妍妍子京都賭徒之旅",
   "short_name": "賭徒之旅",
-  "start_url": "ind.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
