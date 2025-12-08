@@ -2,523 +2,853 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>樂透旅行 LOTTO TRAVEL</title>
-    
-    <!-- iOS Web App 設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>妍妍子京都賭徒之旅</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Noto+Sans+TC:wght@900&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="樂透旅行">
-    <link rel="apple-touch-icon" href="icon.png">
-
+    <link rel="manifest" href="manifest.json">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@900&display=swap');
+        
+
+        /* --- 全局變數 --- */
+        :root {
+            --pachi-red: #ff0033;
+            --pachi-dark: #2a0005;
+            --gold: #ffd700;
+            --neon-pink: #ff00cc;
+            --felt-green: #004d00;
+        }
 
         /* --- 基礎設定 --- */
         body {
-            background-color: #1a0000;
+            background-color: #000;
             background-image: 
-                radial-gradient(circle at 50% 50%, #5a0000 0%, #1a0000 80%),
-                repeating-linear-gradient(45deg, rgba(255,215,0,0.05) 0px, rgba(255,215,0,0.05) 2px, transparent 2px, transparent 10px);
+                radial-gradient(circle at 50% 30%, #400 0%, #000 70%),
+                linear-gradient(0deg, rgba(0,0,0,0.8), transparent 2px),
+                linear-gradient(90deg, rgba(0,0,0,0.8), transparent 2px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
             color: #fff;
-            font-family: 'Noto Sans TC', sans-serif;
+            font-family: 'Mochiy Pop One', 'Noto Sans TC', sans-serif;
             margin: 0;
-            overflow-x: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            /* 防止 iOS 回彈效果 */
-            overscroll-behavior: none;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .hidden { display: none !important; }
-
-        /* --- 黃金質感按鈕 --- */
-        .btn-gold {
-            background: linear-gradient(180deg, #fffebb 0%, #ffd700 40%, #ff8c00 100%);
-            border: none;
-            color: #8b0000;
-            padding: 15px 40px;
-            font-size: 24px;
-            font-weight: 900;
-            border-radius: 50px;
-            cursor: pointer;
-            width: 80%;
-            max-width: 300px;
-            margin: 10px 0;
-            box-shadow: 
-                0 0 15px #ffd700, 
-                0 5px 0 #b84e00,
-                inset 0 2px 5px rgba(255,255,255,0.8);
-            transition: transform 0.1s, filter 0.2s;
-            position: relative;
-            z-index: 10;
-            /* 禁止文字選取 */
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        /* 次要按鈕樣式 (編輯資料用) */
-        .btn-silver {
-            background: linear-gradient(180deg, #e0e0e0 0%, #bdbdbd 40%, #757575 100%);
-            color: #333;
-            box-shadow: 0 0 10px #aaa, 0 5px 0 #555, inset 0 2px 5px rgba(255,255,255,0.5);
-            font-size: 20px;
-        }
-
-        .btn-gold:hover { filter: brightness(1.2); }
-        .btn-gold:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 5px #ffd700, 0 1px 0 #b84e00;
-        }
-        .btn-silver:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 5px #aaa, 0 1px 0 #555;
-        }
-        .btn-gold:disabled {
-            background: #555;
-            color: #aaa;
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
-            filter: grayscale(100%);
-        }
-
-        /* 容器 */
+        
+        /* --- 通用容器 --- */
         .container {
-            text-align: center;
-            width: 95%;
-            max-width: 650px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* --- SVG 標題樣式 --- */
-        .svg-title {
             width: 100%;
-            height: auto;
-            max-width: 600px;
-            filter: drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.8));
-        }
-
-        /* --- 金屬邊框 --- */
-        .gold-frame {
-            background: rgba(0, 0, 0, 0.8);
-            border: 8px solid transparent;
-            border-radius: 20px;
-            background-clip: padding-box;
+            max-width: 500px;
+            text-align: center;
+            padding: 20px;
             position: relative;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
-        }
-        .gold-frame::after {
-            content: '';
-            position: absolute;
-            top: -8px; bottom: -8px;
-            left: -8px; right: -8px;
-            background: linear-gradient(135deg, #b8860b 0%, #ffd700 20%, #fff 50%, #ffd700 80%, #b8860b 100%);
-            z-index: -1;
-            border-radius: 20px;
+            z-index: 2;
+            animation: fadeIn 0.5s ease-out;
         }
 
-        /* --- 輸入介面 --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 標題字體特效 --- */
+        .main-title {
+            font-size: 48px;
+            color: #fff;
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 20px var(--neon-pink),
+                0 0 30px var(--neon-pink),
+                0 0 40px var(--neon-pink);
+            margin: 0;
+            line-height: 1.2;
+            transform: skew(-5deg);
+        }
+        .sub-title {
+            font-size: 20px;
+            color: var(--gold);
+            letter-spacing: 5px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        /* --- 按鈕群組 --- */
+        .home-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        /* 歷史紀錄樣式 */
+        .history-item {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #555;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-info {
+            color: #fff;
+            font-size: 14px;
+        }
+        .history-delete {
+            color: var(--pachi-red);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0 10px;
+            font-weight: bold;
+        }
+
+        /* --- 返回按鈕 --- */
+        .back-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 100;
+        }
+
+        /* --- 霓虹輸入框樣式 --- */
         #input-container {
-            max-height: 50vh;
+            max-height: 60vh;
             overflow-y: auto;
             padding: 10px;
-            scrollbar-width: thin;
-            scrollbar-color: #ffd700 #333;
+            border: 4px solid var(--pachi-red);
+            border-radius: 15px;
+            background: rgba(0,0,0,0.8);
+            box-shadow: 0 0 20px var(--pachi-red), inset 0 0 20px #000;
+            margin-top: 20px;
         }
         .input-group {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #b8860b;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 10px;
-            text-align: left;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #444;
+            padding-bottom: 15px;
         }
-        .input-group h3 { margin: 0 0 10px 0; color: #ffd700; text-shadow: 0 0 5px #000; }
-        .input-row { display: flex; gap: 5px; margin-bottom: 5px; }
+        .input-group h3 {
+            color: var(--gold);
+            text-align: left;
+            margin: 0 0 10px 0;
+            text-shadow: 0 0 5px var(--gold);
+        }
+        .input-row {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
         input {
             width: 100%;
-            padding: 8px;
-            border: 2px solid #555;
+            padding: 10px;
+            background: #222;
+            border: 1px solid #555;
+            color: #fff;
             border-radius: 5px;
-            background: #fff;
+            font-family: 'Noto Sans TC', sans-serif;
             font-weight: bold;
-            font-size: 16px; /* 防止 iOS 縮放 */
         }
-        input:focus { border-color: #ffd700; outline: none; }
+        input:focus {
+            border-color: var(--gold);
+            outline: none;
+            background: #333;
+        }
 
-        /* --- 拉霸機 --- */
-        .slot-machine-container {
-            padding: 30px;
-            margin-bottom: 30px;
+        /* --- 按鈕樣式 (日式街機風) --- */
+        .btn-action {
+            background: linear-gradient(180deg, #ffcc00 0%, #ff6600 100%);
+            border: 4px solid #fff;
+            border-radius: 50px;
+            color: #6d0000;
+            font-size: 24px;
+            padding: 15px 40px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #b34700, 0 0 20px rgba(255, 102, 0, 0.6);
+            transition: transform 0.1s;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
         }
-        .slot-display {
+        .btn-action:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #b34700;
+        }
+        .btn-action:disabled {
+            filter: grayscale(100%);
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: linear-gradient(180deg, #eee 0%, #aaa 100%);
+            color: #333;
+            box-shadow: 0 5px 0 #555;
+        }
+
+        /* --- 頁面 3: Pachislot 機台設計 --- */
+        .slot-machine-frame {
+            background: linear-gradient(135deg, #c0c0c0 0%, #f0f0f0 50%, #808080 100%);
+            padding: 15px;
+            border-radius: 30px 30px 10px 10px;
+            box-shadow: 
+                inset 0 0 30px #000,
+                0 0 50px rgba(255, 0, 50, 0.5);
+            position: relative;
+            width: 340px;
+            margin: 0 auto;
+            border: 2px solid #555;
+        }
+
+        /* 機台頂部面板 */
+        .slot-top-panel {
+            background: radial-gradient(circle, #ff0000 0%, #5a0000 90%);
+            height: 120px;
+            border-radius: 20px 20px 5px 5px;
+            border: 4px solid #ffcc00;
+            margin-bottom: 15px;
             display: flex;
             justify-content: center;
-            gap: 15px;
-            background: #000;
-            padding: 15px;
-            border-radius: 10px;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
             box-shadow: inset 0 0 20px #000;
         }
-        .reel {
-            width: 80px;
-            height: 100px;
-            background: #fff;
+        .hibiscus {
+            font-size: 80px;
+            filter: drop-shadow(0 0 10px #ff0000);
+            animation: pulseLight 1s infinite alternate;
+        }
+        @keyframes pulseLight { from { opacity: 0.6; filter: drop-shadow(0 0 5px #ff0000); } to { opacity: 1; filter: drop-shadow(0 0 20px #fff); } }
+        
+        .hibiscus-text {
+            position: absolute;
+            bottom: 5px;
+            color: #fff;
+            font-size: 24px; /* 加大 */
+            font-weight: 900;
+            text-shadow: 0 0 5px #000, 0 0 10px #ff0000;
+            background: rgba(0,0,0,0.3);
+            width: 100%;
+            padding: 2px 0;
+        }
+
+        /* 滾輪區域 */
+        .slot-display {
+            background: #000;
+            border: 5px solid #333;
             border-radius: 5px;
-            overflow: hidden;
-            border: 2px solid #333;
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: inset 0 0 15px #000;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .slot-display::after {
+            content: '';
+            position: absolute;
+            top: 40%; left: 0; width: 100%; height: 20px;
+            background: rgba(255,255,255,0.1);
+            pointer-events: none;
+        }
+
+        .reel {
+            width: 70px;
+            height: 90px;
+            background: #fff;
+            border-radius: 3px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 50px;
-            background: linear-gradient(to bottom, #ccc 0%, #fff 40%, #fff 60%, #ccc 100%);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            font-size: 45px;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            transition: filter 0.1s;
+            color: #000;
+        }
+        .reel.spinning {
+            filter: blur(4px);
+            background: repeating-linear-gradient(0deg, #fff 0px, #ccc 20px, #fff 40px);
         }
 
-        /* --- 輪盤 --- */
-        .wheel-wrapper {
+        /* 下方面板 (Logo) */
+        .slot-bottom-panel {
+            background: #d00000;
+            height: 80px;
+            border-radius: 5px 5px 15px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            border: 2px solid #fff;
             position: relative;
+            overflow: hidden;
+        }
+        .pachi-logo {
+            transform: rotate(-3deg);
+            background: #000;
+            padding: 5px 10px;
+            border: 2px solid #ffd700;
+            font-size: 20px;
+            line-height: 1.2;
+            text-align: center;
+            color: #ffd700;
+            box-shadow: 0 0 10px #ffd700;
+        }
+
+        /* --- 拉桿設計 --- */
+        .lever-container {
+            position: absolute;
+            right: -50px;
+            top: 180px;
+            width: 40px;
+            height: 100px;
+            z-index: 5;
+        }
+        .lever-base {
+            width: 40px;
+            height: 40px;
+            background: #888;
+            border-radius: 50%;
+            border: 2px solid #333;
+            position: absolute;
+            bottom: 0;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        .lever-stick {
+            width: 10px;
+            height: 70px;
+            background: linear-gradient(90deg, #ccc, #fff, #999);
+            position: absolute;
+            bottom: 20px;
+            left: 15px;
+            transform-origin: bottom center;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .lever-ball {
+            width: 36px;
+            height: 36px;
+            background: radial-gradient(circle at 30% 30%, #ff4444, #8b0000);
+            border-radius: 50%;
+            position: absolute;
+            top: -30px;
+            left: -13px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.8);
+            cursor: pointer;
+        }
+        
+        .lever-pulled .lever-stick {
+            transform: rotateX(60deg) scaleY(0.8);
+        }
+
+        /* --- 頁面 4: 俄羅斯輪盤設計 --- */
+        .roulette-table {
+            background-color: var(--felt-green);
+            background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 10px);
+            border: 15px solid #654321;
+            border-radius: 50%;
+            padding: 10px;
+            box-shadow: 0 0 50px #000, inset 0 0 30px #000;
             width: 320px;
             height: 320px;
             margin: 0 auto;
-            padding: 10px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #b8860b, #ffd700, #fff, #ffd700, #b8860b);
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+            position: relative;
         }
-        .wheel-inner {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: #222;
-            padding: 5px;
-            box-sizing: border-box;
-        }
-        #canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            transition: transform 4s cubic-bezier(0.1, 0.9, 0.2, 1);
-        }
-        .pointer {
+        .turret {
             position: absolute;
-            top: -25px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px; height: 40px;
+            background: radial-gradient(circle, #ffd700, #b8860b);
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 0 10px #000;
+            border: 2px solid #fff;
+        }
+        .pointer-gem {
+            position: absolute;
+            top: -20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 40px; 
-            height: 50px; 
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 100 L0 0 L100 0 Z" fill="%23d00000" stroke="%23fff" stroke-width="5"/></svg>');
-            background-repeat: no-repeat;
-            z-index: 10;
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+            width: 0; height: 0; 
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #fff;
+            filter: drop-shadow(0 2px 2px #000);
+            z-index: 20;
+        }
+        #wheel-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transition: transform 4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* --- 結果彈窗 --- */
-        .modal {
+        /* --- 結算彈窗 --- */
+        .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            z-index: 999;
+            backdrop-filter: blur(5px);
         }
-        .modal-content {
+        .result-card {
             background: #fff;
             color: #000;
-            padding: 40px;
+            width: 85%;
+            max-width: 400px;
             border-radius: 20px;
+            padding: 30px 20px;
             text-align: center;
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 8px solid #ffd700;
-            box-shadow: 0 0 50px #ffd700;
-            max-width: 90%;
+            position: relative;
+            border: 8px solid var(--gold);
+            box-shadow: 0 0 60px var(--gold);
+            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        @keyframes popIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .win-title {
+            color: var(--pachi-red);
+            font-size: 36px;
+            margin: 0;
+            text-shadow: 2px 2px 0 #ffd700;
         }
-
-        /* --- 歷史紀錄 --- */
-        #history-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.5);
-            color: #ffd700;
-            border: 2px solid #ffd700;
-            padding: 5px 15px;
+        .shop-name {
+            font-size: 28px;
+            margin: 20px 0 5px 0;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .win-details {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        .badge {
+            background: #000;
+            color: var(--gold);
+            padding: 5px 10px;
             border-radius: 5px;
-            cursor: pointer;
-            z-index: 200;
-            font-weight: bold;
-        }
-        #history-panel {
-            position: fixed;
-            top: 60px;
-            right: 20px;
-            width: 250px;
-            background: rgba(0,0,0,0.95);
-            border: 2px solid #ffd700;
-            padding: 10px;
-            max-height: 400px;
-            overflow-y: auto;
-            display: none;
-            z-index: 200;
-            border-radius: 10px;
-        }
-        .history-item { 
-            border-bottom: 1px solid #444; 
-            padding: 8px 0; 
-            font-size: 14px; 
-            display: flex; 
-            justify-content: space-between;
-            color: #ddd;
+            font-size: 14px;
+            margin-right: 5px;
         }
 
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: #999;
+            text-decoration: underline;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
 
-    <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:#fffebb;stop-opacity:1" />
-                <stop offset="20%" style="stop-color:#ffd700;stop-opacity:1" />
-                <stop offset="50%" style="stop-color:#b8860b;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#8b0000;stop-opacity:1" />
-            </linearGradient>
-            <filter id="glow">
-                <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
-                <feMerge>
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-            </filter>
-        </defs>
-    </svg>
-
-    <button id="history-btn" onclick="toggleHistory()">📜 紀錄</button>
-    <div id="history-panel">
-        <h4 style="margin:0; color:#ffd700; text-align:center; border-bottom:1px solid #555; padding-bottom:5px;">旅程紀錄</h4>
-        <div id="history-list"></div>
-    </div>
-
-    <!-- 頁面 1: 開始 -->
     <div id="page-start" class="container">
-        <svg class="svg-title" viewBox="0 0 400 150">
-            <text x="50%" y="60" text-anchor="middle" font-size="70" font-weight="900" fill="url(#goldGradient)" stroke="none" filter="url(#glow)" style="font-family: 'Noto Sans TC', sans-serif;">
-                樂透旅行
-            </text>
-            <text x="50%" y="110" text-anchor="middle" font-size="30" font-weight="900" fill="#ffd700" letter-spacing="5">
-                LOTTO TRAVEL
-            </text>
-        </svg>
-        <br><br>
-        <!-- 修改：兩個按鈕 -->
-        <button class="btn-gold" onclick="startDirectly()">開始旅程 START</button>
-        <br>
-        <button class="btn-gold btn-silver" onclick="goToInput()">設定連結 SETTING</button>
-    </div>
-
-    <!-- 頁面 2: 輸入連結 (編輯資料) -->
-    <div id="page-input" class="container hidden">
-        <h2 style="color:#ffd700; text-shadow:0 0 10px #b8860b;">設定景點資料</h2>
-        <div class="gold-frame">
-            <div id="input-container"></div>
-        </div>
-        <br>
-        <!-- 修改：儲存並返回 -->
-        <button class="btn-gold" onclick="saveAndReturn()">儲存並返回 SAVE</button>
-    </div>
-
-    <!-- 頁面 3: 拉霸機 -->
-    <div id="page-slot" class="container hidden">
-        <svg class="svg-title" viewBox="0 0 400 80">
-            <text x="50%" y="60" text-anchor="middle" font-size="50" font-weight="900" fill="url(#goldGradient)" stroke="none" filter="url(#glow)">
-                今天去哪裡?
-            </text>
-        </svg>
+        <h1 class="main-title" style="font-size: 42px;">妍妍子<br>京都賭徒之旅</h1>
+        <div class="sub-title">KYOTO GAMBLER TOUR</div>
         
-        <div class="gold-frame slot-machine-container">
-            <div class="slot-display">
-                <div class="reel" id="reel1">🥩</div>
-                <div class="reel" id="reel2">🍜</div>
-                <div class="reel" id="reel3">🍰</div>
-            </div>
+        <div style="font-size:60px; margin:20px 0; text-shadow:0 0 20px var(--pachi-red);">🌺</div>
+        
+        <div class="home-btn-group">
+            <button class="btn-action" id="btn-start">開始遊戲</button>
+            <button class="btn-action btn-secondary" id="btn-input">設定資料</button>
+            <button class="btn-action btn-secondary" style="background: linear-gradient(180deg, #444 0%, #222 100%); color: #fff; border-color: #777;" id="btn-history">抽獎紀錄</button>
         </div>
-
-        <button id="btn-spin-slot" class="btn-gold" onclick="spinSlot()">拉下搖桿 GO!</button>
-        <p id="slot-msg" style="height: 20px; color: #ffd700; font-weight:bold; margin-top:10px;"></p>
     </div>
 
-    <!-- 頁面 4: 輪盤 -->
-    <div id="page-roulette" class="container hidden">
-        <svg class="svg-title" viewBox="0 0 400 80">
-            <text x="50%" y="60" text-anchor="middle" font-size="50" font-weight="900" fill="url(#goldGradient)" stroke="none" filter="url(#glow)">
-                預算大輪盤
-            </text>
-        </svg>
-        <br>
-        <div class="wheel-wrapper">
-            <div class="wheel-inner">
-                <div class="pointer"></div>
-                <canvas id="canvas" width="300" height="300"></canvas>
+    <div id="page-input" class="container hidden">
+        <div class="back-btn" data-target="page-start">⬅ 返回</div>
+        <h2 style="color:var(--gold); margin-top:40px;">店家資料設定</h2>
+        <p style="font-size:12px; color:#aaa;">(輸入後將自動儲存)</p>
+        <div id="input-container">
             </div>
-        </div>
-        <br><br>
-        <button id="btn-spin-wheel" class="btn-gold" onclick="spinWheel()">決定預算!</button>
     </div>
 
-    <!-- 結果彈窗 -->
-    <div id="result-modal" class="modal hidden">
-        <div class="modal-content">
-            <div style="font-size:40px; color:#d00000; font-weight:900; text-shadow:1px 1px 0 #ffd700;">大獎決定！</div>
-            <h2 id="res-category" style="color:#333; font-size:50px; margin:20px 0;">...</h2>
-            <h3 id="res-budget" style="color:#b8860b; font-size:30px;">...</h3>
+    <div id="page-slot" class="container hidden">
+        <div class="back-btn" data-target="page-start">⬅ 返回</div>
+        <h2 style="color:#fff; text-shadow:0 0 10px var(--pachi-red); margin-top:40px;">今天吃什麼?</h2>
+        
+        <div class="slot-machine-frame">
+            <div class="slot-top-panel">
+                <div class="hibiscus" id="hibiscus-light">🌺</div>
+                <div class="hibiscus-text">種類抽取</div>
+            </div>
             
-            <a id="res-link" href="#" target="_blank" class="btn-gold" style="text-decoration:none; display:inline-block; margin-top:20px; font-size:18px;">前往 GOOGLE MAP</a>
-            <br><br>
-            <button onclick="closeModal()" style="background:none; border:none; text-decoration:underline; cursor:pointer; color:#888;">關閉</button>
+            <div class="slot-display">
+                <div class="reel" id="reel1">7</div>
+                <div class="reel" id="reel2">7</div>
+                <div class="reel" id="reel3">7</div>
+            </div>
+
+            <div class="slot-bottom-panel">
+                <div class="pachi-logo">賭狗賭狗<br>一無所有</div>
+            </div>
+
+            <div class="lever-container" id="lever">
+                <div class="lever-base"></div>
+                <div class="lever-stick">
+                    <div class="lever-ball"></div>
+                </div>
+            </div>
+        </div>
+
+        <p id="slot-msg" style="color:var(--gold); font-size:18px; height:24px; margin-top:15px;"></p>
+    </div>
+
+    <div id="page-roulette" class="container hidden">
+        <div class="back-btn" data-target="page-start">⬅ 返回</div>
+        <h2 style="color:var(--gold); margin-bottom:20px; text-shadow: 0 2px 4px #000;">預算輪盤</h2>
+        
+        <div class="roulette-table">
+            <div class="pointer-gem"></div>
+            <div class="turret"></div>
+            <canvas id="wheel-canvas" width="300" height="300"></canvas>
+        </div>
+
+        <div style="height: 30px;"></div> <button id="spin-wheel-btn" class="btn-action">開始轉動!</button>
+    </div>
+
+    <div id="page-history" class="container hidden">
+        <div class="back-btn" data-target="page-start">⬅ 返回</div>
+        <h2 style="color:var(--gold); margin-top:40px;">抽獎紀錄</h2>
+        <div id="history-container" style="max-height:60vh; overflow-y:auto; text-align:left;">
+            <!-- 紀錄列表 -->
+        </div>
+    </div>
+
+    <div id="mission-modal" class="modal-overlay hidden">
+        <div class="result-card" style="border-color: var(--neon-pink); box-shadow: 0 0 30px var(--neon-pink);">
+            <h1 class="win-title" style="color: var(--neon-pink);">特別任務!</h1>
+            <div style="font-size:60px; margin:20px 0;">📸</div>
+            <p style="font-size:20px; color:#333; font-weight:bold; margin-bottom:30px;">
+                搭配完拍出好看的<br>五張照片後<br>進入結算框
+            </p>
+            <button class="btn-action" id="btn-mission-ok">接受挑戰</button>
+        </div>
+    </div>
+
+    <div id="result-modal" class="modal-overlay hidden">
+        <div class="result-card">
+            <h1 class="win-title">大獎決定!</h1>
+            <div style="font-size:60px; margin:10px 0;">🎉</div>
+            <div class="shop-name" id="res-shop-name">載入中...</div>
+            <div class="win-details">
+                <span class="badge" id="res-cat">類別</span>
+                <span style="color:#d00000; font-weight:bold;" id="res-bud">等級</span>
+            </div>
+            
+            <a id="res-link" href="#" target="_blank" class="btn-action" style="text-decoration:none; display:inline-block; font-size:20px; padding:10px 30px;">出發</a>
+            <br>
+            <button class="close-btn" id="btn-close-modal">關閉視窗</button>
         </div>
     </div>
 
     <script>
-        // --- 1. 資料結構 ---
-        // 修改：將「景點」改為「購物」
+        /* --- 資料設定 --- */
         const categories = ["燒肉", "壽司", "甜點", "購物", "簡餐", "拉麵", "其他"];
         const icons = {"燒肉":"🥩", "壽司":"🍣", "甜點":"🍰", "購物":"🛍️", "簡餐":"🍱", "拉麵":"🍜", "其他":"🎲"};
         
+        // 資料結構
         let travelData = {}; 
+        let historyData = [];
+
+        // 狀態變數
         let currentCategory = "";
-        let currentBudget = "";
-        let spinCount = 0;
+        let currentBudget = ""; // high, mid, low
+        let slotSpinCount = 0;
 
+        /* --- 1. 初始化與輸入處理 (含 LocalStorage) --- */
+        
         // 頁面載入時讀取資料
-        window.onload = function() {
-            loadDataFromStorage();
-        };
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromLocal();
+            bindEvents();
+            registerServiceWorker();
+        });
 
-        function loadDataFromStorage() {
-            const stored = localStorage.getItem('lottoTravelDataLinks');
-            if (stored) {
-                travelData = JSON.parse(stored);
-            } else {
-                // 如果沒有資料，初始化為空
-                categories.forEach(cat => {
-                    travelData[cat] = { high: "", mid: "", low: "" };
-                });
+        function bindEvents() {
+            const startBtn = document.getElementById('btn-start');
+            if (startBtn) startBtn.addEventListener('click', checkDataAndStart);
+            const inputBtn = document.getElementById('btn-input');
+            if (inputBtn) inputBtn.addEventListener('click', goToInput);
+            const historyBtn = document.getElementById('btn-history');
+            if (historyBtn) historyBtn.addEventListener('click', goToHistory);
+
+            document.querySelectorAll('.back-btn[data-target]').forEach(btn => {
+                btn.addEventListener('click', () => showPage(btn.dataset.target));
+            });
+            const leverEl = document.getElementById('lever');
+            if (leverEl) leverEl.addEventListener('click', pullLever);
+            const spinBtn = document.getElementById('spin-wheel-btn');
+            if (spinBtn) spinBtn.addEventListener('click', spinWheel);
+            const closeBtn = document.getElementById('btn-close-modal');
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            const missionOkBtn = document.getElementById('btn-mission-ok');
+            if (missionOkBtn) missionOkBtn.addEventListener('click', closeMissionModal);
+        }
+
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js');
             }
         }
 
-        // 初始化輸入框 (每次進入設定頁面時產生)
+        function loadDataFromLocal() {
+            const savedData = localStorage.getItem('travelPachiData');
+            if (savedData) {
+                travelData = JSON.parse(savedData);
+            } else {
+                // 如果沒有存檔，初始化空物件
+                categories.forEach(cat => {
+                    travelData[cat] = { high: {}, mid: {}, low: {} };
+                });
+            }
+
+            const savedHistory = localStorage.getItem('travelPachiHistory');
+            if (savedHistory) {
+                historyData = JSON.parse(savedHistory);
+            }
+        }
+
+        function saveDataToLocal() {
+            localStorage.setItem('travelPachiData', JSON.stringify(travelData));
+        }
+
+        function saveHistoryToLocal() {
+            localStorage.setItem('travelPachiHistory', JSON.stringify(historyData));
+        }
+
         function initInputs() {
             const container = document.getElementById('input-container');
-            container.innerHTML = ""; 
+            container.innerHTML = ""; // 重新生成以確保資料最新
+
             categories.forEach(cat => {
-                // 確保該類別存在 (防止改版後舊資料缺少新類別)
-                if(!travelData[cat]) travelData[cat] = { high: "", mid: "", low: "" };
+                // 確保資料結構存在
+                if (!travelData[cat]) travelData[cat] = { high: {}, mid: {}, low: {} };
 
                 const div = document.createElement('div');
                 div.className = 'input-group';
+                
+                // 讀取現有值
+                const hName = travelData[cat].high.name || "";
+                const hUrl = travelData[cat].high.url || "";
+                const mName = travelData[cat].mid.name || "";
+                const mUrl = travelData[cat].mid.url || "";
+                const lName = travelData[cat].low.name || "";
+                const lUrl = travelData[cat].low.url || "";
+
                 div.innerHTML = `
                     <h3>${icons[cat]} ${cat}</h3>
-                    <div class="input-row"><input placeholder="高預算 $$$" value="${travelData[cat].high}" onchange="updateData('${cat}', 'high', this.value)"></div>
-                    <div class="input-row"><input placeholder="中預算 $$" value="${travelData[cat].mid}" onchange="updateData('${cat}', 'mid', this.value)"></div>
-                    <div class="input-row"><input placeholder="低預算 $" value="${travelData[cat].low}" onchange="updateData('${cat}', 'low', this.value)"></div>
+                    <div class="input-row">
+                        <input placeholder="高預算店名" value="${hName}" onchange="saveInput('${cat}','high','name',this.value)">
+                        <input placeholder="連結" value="${hUrl}" onchange="saveInput('${cat}','high','url',this.value)">
+                    </div>
+                    <div class="input-row">
+                        <input placeholder="中預算店名" value="${mName}" onchange="saveInput('${cat}','mid','name',this.value)">
+                        <input placeholder="連結" value="${mUrl}" onchange="saveInput('${cat}','mid','url',this.value)">
+                    </div>
+                    <div class="input-row">
+                        <input placeholder="低預算店名" value="${lName}" onchange="saveInput('${cat}','low','name',this.value)">
+                        <input placeholder="連結" value="${lUrl}" onchange="saveInput('${cat}','low','url',this.value)">
+                    </div>
                 `;
                 container.appendChild(div);
             });
         }
 
-        function updateData(cat, level, val) {
-            travelData[cat][level] = val;
-            // 每次變更即時存入 localStorage (雙重保險)
-            localStorage.setItem('lottoTravelDataLinks', JSON.stringify(travelData));
+        function saveInput(cat, level, field, value) {
+            if(!travelData[cat][level]) travelData[cat][level] = {};
+            travelData[cat][level][field] = value;
+            saveDataToLocal(); // 每次修改立刻存檔
         }
 
-        // --- 頁面切換 ---
         function showPage(id) {
-            document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.container, .modal-overlay').forEach(el => el.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
-        // 按下「設定連結」
         function goToInput() {
-            loadDataFromStorage(); // 確保讀到最新
             initInputs();
             showPage('page-input');
         }
 
-        // 按下「儲存並返回」
-        function saveAndReturn() {
-            localStorage.setItem('lottoTravelDataLinks', JSON.stringify(travelData));
-            showPage('page-start');
+        function goToHistory() {
+            renderHistory();
+            showPage('page-history');
         }
 
-        // 按下「開始旅程」
-        function startDirectly() {
-            loadDataFromStorage(); // 確保有資料
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            container.innerHTML = "";
+            
+            if (historyData.length === 0) {
+                container.innerHTML = "<div style='color:#999; text-align:center; margin-top:50px;'>尚無紀錄</div>";
+                return;
+            }
+
+            // 反序顯示，最新的在上面
+            [...historyData].reverse().forEach((item, index) => {
+                // 原始 index 需要計算，因為我們反序了顯示
+                const originalIndex = historyData.length - 1 - index;
+                
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div class="history-info">
+                        <div style="color:var(--gold); font-weight:bold;">${item.time}</div>
+                        <div style="font-size:16px;">${icons[item.category] || ""} ${item.category} - ${item.budget}</div>
+                        <div style="color:#aaa;">${item.shop}</div>
+                    </div>
+                    <div class="history-delete" onclick="deleteHistory(${originalIndex})">×</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function deleteHistory(index) {
+            if (confirm("確定要刪除這筆紀錄嗎？")) {
+                historyData.splice(index, 1);
+                saveHistoryToLocal();
+                renderHistory();
+            }
+        }
+
+        function checkDataAndStart() {
+            // 直接開始，不強迫檢查是否已填寫 (增加娛樂性，如果沒填就是空的)
             showPage('page-slot');
         }
 
-        // --- 拉霸機邏輯 ---
-        function spinSlot() {
-            const btn = document.getElementById('btn-spin-slot');
-            btn.disabled = true;
+        /* --- 2. 拉霸機邏輯 --- */
+        let isSlotSpinning = false;
 
-            spinCount++;
+        function pullLever() {
+            if (isSlotSpinning) return;
+            
+            // 拉桿動畫
+            const lever = document.getElementById('lever');
+            lever.classList.add('lever-pulled');
+            setTimeout(() => lever.classList.remove('lever-pulled'), 300);
+
+            startSlotSpin();
+        }
+
+        function startSlotSpin() {
+            isSlotSpinning = true;
+            slotSpinCount++;
+            
             const reel1 = document.getElementById('reel1');
             const reel2 = document.getElementById('reel2');
             const reel3 = document.getElementById('reel3');
             const msg = document.getElementById('slot-msg');
-            
-            msg.innerText = "轉動中...";
-            msg.style.color = "#ffd700";
-            
-            let interval = setInterval(() => {
-                reel1.innerText = getRandomIcon();
-                reel2.innerText = getRandomIcon();
-                reel3.innerText = getRandomIcon();
-            }, 80);
+            const hibiscus = document.getElementById('hibiscus-light');
 
+            // 視覺效果
+            [reel1, reel2, reel3].forEach(r => {
+                r.classList.add('spinning'); 
+                r.textContent = "";
+            });
+            msg.textContent = "轉動中...";
+            hibiscus.style.animationDuration = "0.2s"; // 加快閃爍
+
+            // 滾動動畫 Interval
+            if (window.slotInterval) clearInterval(window.slotInterval);
+            window.slotInterval = setInterval(() => {
+                reel1.textContent = getRandomIcon();
+                reel2.textContent = getRandomIcon();
+                reel3.textContent = getRandomIcon();
+            }, 100);
+
+            // 決定結果 (第5次保底中獎，或30%機率中獎)
+            let isWin = (Math.random() > 0.7) || (slotSpinCount >= 5);
+            
+            // 模擬滾動時間
             setTimeout(() => {
-                clearInterval(interval);
-                let isWin = (Math.random() > 0.7) || (spinCount >= 5);
-                
-                if (isWin) {
-                    const winCat = categories[Math.floor(Math.random() * categories.length)];
-                    const icon = icons[winCat];
-                    
-                    reel1.innerText = icon;
-                    reel2.innerText = icon;
-                    reel3.innerText = icon;
-                    
-                    msg.innerText = "恭喜中獎！進入下一關！";
-                    msg.style.color = "#fff";
-                    currentCategory = winCat; 
-
-                    setTimeout(() => {
-                        initWheel();
-                        showPage('page-roulette');
-                        btn.disabled = false; 
-                    }, 1500);
-                } else {
-                    reel1.innerText = getRandomIcon();
-                    reel2.innerText = getRandomIcon();
-                    reel3.innerText = getRandomIcon();
-                    // 強制不中
-                    if(reel1.innerText == reel2.innerText && reel2.innerText == reel3.innerText){
-                        reel3.innerText = reel1.innerText === "🥩" ? "🍜" : "🥩";
-                    }
-                    msg.innerText = `沒中... 再試一次 (${spinCount}/5)`;
-                    msg.style.color = "#ffd700";
-                    btn.disabled = false;
-                }
+                stopReels(isWin);
             }, 2000);
+        }
+
+        function stopReels(isWin) {
+            const reel1 = document.getElementById('reel1');
+            const reel2 = document.getElementById('reel2');
+            const reel3 = document.getElementById('reel3');
+            const msg = document.getElementById('slot-msg');
+            const hibiscus = document.getElementById('hibiscus-light');
+
+            [reel1, reel2, reel3].forEach(r => r.classList.remove('spinning'));
+            if (window.slotInterval) clearInterval(window.slotInterval);
+
+            if (isWin) {
+                // 中獎邏輯
+                const winCat = categories[Math.floor(Math.random() * categories.length)];
+                const icon = icons[winCat];
+
+                reel1.textContent = icon;
+                reel2.textContent = icon;
+                reel3.textContent = icon;
+
+                msg.textContent = `恭喜! 下一關: ${winCat}`;
+                msg.style.color = "#ff00cc";
+                currentCategory = winCat;
+                
+                // 大花瘋狂閃爍
+                hibiscus.style.filter = "drop-shadow(0 0 30px #fff)";
+                
+                setTimeout(() => {
+                    if (winCat === "購物") {
+                        // 顯示特別任務
+                        document.getElementById('mission-modal').classList.remove('hidden');
+                        isSlotSpinning = false; // 暫停自旋鎖，等待任務確認
+                        // 注意：這裡不設定 isSlotSpinning = false 以防止重複拉桿，直到任務確認
+                    } else {
+                        initRoulette(); // 準備輪盤
+                        showPage('page-roulette');
+                        isSlotSpinning = false;
+                    }
+                }, 2000);
+
+            } else {
+                // 失敗邏輯
+                reel1.textContent = getRandomIcon();
+                reel2.textContent = getRandomIcon();
+                reel3.textContent = getRandomIcon();
+                
+                // 確保不三個一樣
+                if(reel1.textContent == reel2.textContent && reel2.textContent == reel3.textContent) {
+                    reel3.textContent = (reel1.textContent === "🥩") ? "🍜" : "🥩";
+                }
+
+                msg.textContent = `再試一次 (${slotSpinCount}/5)`;
+                msg.style.color = "#fff";
+                hibiscus.style.animationDuration = "1s"; // 恢復正常
+                isSlotSpinning = false;
+            }
+        }
+
+        function closeMissionModal() {
+            document.getElementById('mission-modal').classList.add('hidden');
+            initRoulette();
+            showPage('page-roulette');
         }
 
         function getRandomIcon() {
@@ -526,173 +856,149 @@
             return icons[keys[Math.floor(Math.random() * keys.length)]];
         }
 
-        // --- 輪盤邏輯 ---
-        let wheelSegments = [];
-        let ctx;
+        /* --- 3. 輪盤邏輯 --- */
+        let segments = [];
+        let ctx = null;
+        
+        // 固定的數學機率 (介面隱藏)
+        const LOGIC_PROBS = { high: 0.15, mid: 0.45, low: 0.40 };
 
-        function initWheel() {
-            const canvas = document.getElementById("canvas");
-            canvas.width = 300; 
-            canvas.height = 300;
+        function initRoulette() {
+            const canvas = document.getElementById("wheel-canvas");
+            canvas.style.transition = 'none';
+            canvas.style.transform = `rotate(0deg)`;
+            
             ctx = canvas.getContext("2d");
             
-            let r1 = Math.floor(Math.random() * 40) + 15; 
-            let r2 = Math.floor(Math.random() * (90 - r1 - 10)) + 10;
-            let r3 = 100 - r1 - r2;
+            // 視覺大小隨機 (假象)
+            let visualR1 = Math.floor(Math.random() * 40) + 20; 
+            let visualR2 = Math.floor(Math.random() * (90 - visualR1 - 10)) + 10;
+            let visualR3 = 100 - visualR1 - visualR2;
 
-            wheelSegments = [
-                { label: "高預算", chance: r1, color: "#d00000", code: "high", txtColor:"#fff" },
-                { label: "中預算", chance: r2, color: "#ffd700", code: "mid", txtColor:"#000" },
-                { label: "低預算", chance: r3, color: "#fff", code: "low", txtColor:"#000" }
+            // 建立區塊資料 (中文)
+            segments = [
+                { id: "high", label: "高", fullLabel: "高預算", visualSize: visualR1, color: "#d00000", text: "#fff" }, 
+                { id: "mid",  label: "中", fullLabel: "中預算", visualSize: visualR2, color: "#000000", text: "#ffd700" }, 
+                { id: "low",  label: "低", fullLabel: "低預算", visualSize: visualR3, color: "#004d00", text: "#fff" }  
             ];
-            
-            drawRouletteWheel();
+
+            drawWheel();
         }
 
-        function drawRouletteWheel() {
+        function drawWheel() {
             if (!ctx) return;
-            let total = 100;
-            let currentAngle = 0;
             const centerX = 150;
             const centerY = 150;
             const radius = 150;
-            
-            wheelSegments.forEach(seg => {
-                const sliceAngle = (seg.chance / total) * 2 * Math.PI;
-                seg.startAngle = currentAngle;
-                seg.endAngle = currentAngle + sliceAngle;
+            let startAngle = 0; 
 
+            segments.forEach(seg => {
+                const sliceAngle = (seg.visualSize / 100) * 2 * Math.PI;
+                seg.startAngle = startAngle;
+                seg.endAngle = startAngle + sliceAngle;
+
+                // 畫扇形
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
                 ctx.closePath();
                 ctx.fillStyle = seg.color;
                 ctx.fill();
-                
-                ctx.lineWidth = 2;
+
+                // 畫金色邊框
+                ctx.lineWidth = 4;
                 ctx.strokeStyle = "#b8860b";
                 ctx.stroke();
-                
+
+                // 畫文字
                 ctx.save();
-                const textAngle = currentAngle + sliceAngle / 2;
-                ctx.translate(centerX + Math.cos(textAngle) * (radius * 0.65), 
-                              centerY + Math.sin(textAngle) * (radius * 0.65));
+                const textAngle = startAngle + sliceAngle / 2;
+                ctx.translate(centerX + Math.cos(textAngle) * (radius * 0.7), 
+                              centerY + Math.sin(textAngle) * (radius * 0.7));
                 ctx.rotate(textAngle + Math.PI / 2);
-                
-                ctx.fillStyle = seg.txtColor;
-                ctx.font = "900 24px 'Noto Sans TC'";
+                ctx.fillStyle = seg.text;
+                ctx.font = "900 30px 'Noto Sans TC'";
                 ctx.textAlign = "center";
-                ctx.fillText(seg.label, 0, 8); 
-                
+                ctx.fillText(seg.label, 0, 10);
                 ctx.restore();
 
-                currentAngle += sliceAngle;
+                startAngle += sliceAngle;
             });
         }
 
         function spinWheel() {
-            const btn = document.getElementById('btn-spin-wheel');
+            const btn = document.getElementById('spin-wheel-btn');
             btn.disabled = true;
+            btn.innerText = "轉動中...";
 
-            const canvas = document.getElementById("canvas");
+            // 1. 根據固定機率決定贏家
+            const rand = Math.random();
+            let resultId = "";
+            if (rand < LOGIC_PROBS.high) resultId = "high";
+            else if (rand < LOGIC_PROBS.high + LOGIC_PROBS.mid) resultId = "mid";
+            else resultId = "low";
 
-            let rand = Math.random() * 100;
-            let sum = 0;
-            let winner = null;
-            
-            for(let seg of wheelSegments) {
-                sum += seg.chance;
-                if(rand <= sum) {
-                    winner = seg;
-                    break;
-                }
-            }
-            if(!winner) winner = wheelSegments[wheelSegments.length-1];
-            
-            currentBudget = winner.code;
+            currentBudget = resultId;
+            const targetSegment = segments.find(s => s.id === resultId);
 
-            // 計算目標角度
-            let startDeg = winner.startAngle * (180/Math.PI);
-            let endDeg = winner.endAngle * (180/Math.PI);
-            
-            let targetOffset = Math.random() * (endDeg - startDeg - 10) + 5; 
-            let targetAngleOnWheel = startDeg + targetOffset; 
+            // 2. 計算角度 (將贏家區塊轉到 12點鐘方向)
+            const segmentCenterRad = targetSegment.startAngle + (targetSegment.endAngle - targetSegment.startAngle) / 2;
+            const segmentCenterDeg = segmentCenterRad * (180 / Math.PI);
 
-            let extraSpins = 360 * 8; 
-            let finalRotate = extraSpins + (270 - targetAngleOnWheel);
+            const randomOffset = (Math.random() * 10) - 5;
+            const extraSpins = 360 * 10; 
+            const finalRotate = extraSpins + (270 - segmentCenterDeg) + randomOffset;
 
+            // 3. 動畫
+            const canvas = document.getElementById("wheel-canvas");
+            canvas.style.transition = 'transform 5s cubic-bezier(0.1, 1, 0.1, 1)';
             canvas.style.transform = `rotate(${finalRotate}deg)`;
 
             setTimeout(() => {
-                showResult(winner.label);
-                btn.disabled = false; 
-            }, 4100);
+                showFinalResult(targetSegment);
+                btn.disabled = false;
+                btn.innerText = "開始轉動!";
+            }, 5500);
         }
 
-        // --- 結果與紀錄 ---
-        function showResult(budgetLabel) {
+        /* --- 4. 結算畫面 --- */
+        function showFinalResult(winnerSeg) {
             const modal = document.getElementById('result-modal');
-            const link = travelData[currentCategory][currentBudget] || "https://www.google.com/maps";
+            const shopNameEl = document.getElementById('res-shop-name');
+            const linkBtn = document.getElementById('res-link');
             
-            document.getElementById('res-category').innerText = icons[currentCategory] + " " + currentCategory;
-            document.getElementById('res-budget').innerText = budgetLabel;
-            document.getElementById('res-link').href = link;
-            
-            modal.classList.remove('hidden');
+            // 取得資料
+            const data = travelData[currentCategory] ? travelData[currentCategory][currentBudget] : {};
+            const name = (data && data.name) ? data.name : "未設定店名";
+            const url = (data && data.url) ? data.url : "https://www.google.com/maps";
 
-            saveHistory(currentCategory, budgetLabel, link);
+            // 填入資訊
+            document.getElementById('res-cat').textContent = icons[currentCategory] + " " + currentCategory;
+            document.getElementById('res-bud').textContent = winnerSeg.fullLabel;
+            shopNameEl.textContent = name;
+            linkBtn.href = url;
+
+            // 新增紀錄
+            const now = new Date();
+            const timeStr = `${now.getMonth()+1}/${now.getDate()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+            historyData.push({
+                time: timeStr,
+                category: currentCategory,
+                budget: winnerSeg.fullLabel,
+                shop: name
+            });
+            saveHistoryToLocal();
+
+            modal.classList.remove('hidden');
         }
 
         function closeModal() {
             document.getElementById('result-modal').classList.add('hidden');
             showPage('page-start');
-            spinCount = 0;
-            document.getElementById("canvas").style.transition = 'none';
-            document.getElementById("canvas").style.transform = "rotate(0deg)";
-            setTimeout(() => {
-                document.getElementById("canvas").style.transition = 'transform 4s cubic-bezier(0.1, 0.9, 0.2, 1)';
-            }, 100);
+            slotSpinCount = 0;
+            currentCategory = "";
+            currentBudget = "";
         }
-
-        function saveHistory(cat, bud, link) {
-            let history = JSON.parse(localStorage.getItem('lottoTravelHistory')) || [];
-            const time = new Date().toLocaleTimeString('zh-TW', {hour: '2-digit', minute:'2-digit'});
-            history.unshift({ time, cat, bud, link });
-            localStorage.setItem('lottoTravelHistory', JSON.stringify(history));
-            renderHistory();
-        }
-
-        function renderHistory() {
-            let history = JSON.parse(localStorage.getItem('lottoTravelHistory')) || [];
-            const list = document.getElementById('history-list');
-            list.innerHTML = "";
-            history.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.innerHTML = `
-                    <span>${item.time} ${item.cat} [${item.bud}]</span>
-                    <div>
-                        <a href="${item.link}" target="_blank" style="text-decoration:none;">📍</a>
-                        <span class="del-btn" onclick="deleteHistory(${index})" style="color:#ff4444; margin-left:10px; cursor:pointer;">✖</span>
-                    </div>
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        function deleteHistory(index) {
-            let history = JSON.parse(localStorage.getItem('lottoTravelHistory')) || [];
-            history.splice(index, 1);
-            localStorage.setItem('lottoTravelHistory', JSON.stringify(history));
-            renderHistory();
-        }
-
-        function toggleHistory() {
-            const panel = document.getElementById('history-panel');
-            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-        }
-        
-        renderHistory();
 
     </script>
 </body>
